@@ -1,3 +1,3 @@
-# Gesture Controlled Raspberrypi Rover
+# Gesture Controlled RaspberryPi Rover
 
-Gesture Controlled Raspberrypi Rover script
+Gesture Controlled RaspberryPi Rover script
