@@ -45,7 +45,7 @@ const uint8_t MPU6050_REGISTER_SIGNAL_PATH_RESET  = 0x68;
 int16_t AccelX, AccelY, AccelZ, Temperature, GyroX, GyroY, GyroZ;
 double x; double y; double z;
 int minVal = 265; int maxVal = 402;
-char temp[10];
+char temp[20];
 
 // WiFi
 // Make sure to update this for your own WiFi network!
@@ -54,12 +54,12 @@ const char* wifi_password = "";
 
 // MQTT
 // Make sure to update this for your own MQTT Broker!
-const char* mqtt_server = "192.168.100.195";
+const char* mqtt_server = "192.168.100.196";
 const char* mqtt_topic = "aucovei";
 const char* mqtt_username = "visoni";
 const char* mqtt_password = "password";
 // The client id identifies the ESP8266 device. Think of it a bit like a hostname (Or just a name, like Greg).
-const char* clientID = "Client ID";
+const char* clientID = "aucovei01";
 
 // Initialise the WiFi and MQTT Client objects
 WiFiClient wifiClient;
@@ -170,10 +170,9 @@ void loop() {
   serialData = String(A_x, 2);
   serialData = serialData + "|" + String(A_y, 2);
   Serial.println(serialData);
-
   serialData.toCharArray(temp, serialData.length() + 1);
-
-  if (client.publish(mqtt_topic, (uint8_t*)temp, 10, true)) {
+  
+  if (client.publish(mqtt_topic, (uint8_t*)temp, strlen(temp))) {
     Serial.println("Message sent!");
     displayColor(COLOR_BLUE);
   }
@@ -184,11 +183,10 @@ void loop() {
     Serial.println("Message failed to send. Reconnecting to MQTT Broker and trying again");
     client.connect(clientID, mqtt_username, mqtt_password);
     delay(10); // This delay ensures that client.publish doesn't clash with the client.connect call
-    client.publish(mqtt_topic, (uint8_t*)temp, 10, true);
+    client.publish(mqtt_topic, (uint8_t*)temp, strlen(temp));
   }
-
-  delay(200); // Wait 0.5 seconds and scan again
-  displayColor(COLOR_BLACK);
+  
+  delay(50); // Wait 0.5 seconds and scan again
 }
 
 void I2C_Write(uint8_t deviceAddress, uint8_t regAddress, uint8_t data) {
