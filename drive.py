@@ -1,10 +1,9 @@
 import math
 import socket
 
-import paho.mqtt.client as mqtt
-
 import motor
-
+import paho.mqtt.client as mqtt
+import RPi.GPIO as GPIO
 import turn
 
 status     = 1          #Motor rotation
@@ -34,7 +33,8 @@ def turn_head(angle):
 
 def get_angle_from_coords(x,y):
     angle = 0.0
-    if x==0.0 and y==0.0:
+    #if x==0.0 and y==0.0:
+    if 0 <= abs(x) <= 0.1 and 0 <= abs(y) <= 0.1:
         angle = 90.0
     elif x>=0.0 and y>=0.0:
         # first quadrant
@@ -90,9 +90,15 @@ def on_message(client, userdata, msg):
         if(len(values) > 1):
             x = float(values[0])
             y = float(values[1])
+
             angle = get_angle_from_coords(x,y)
             if angle > 180:
                 angle = round(360 - angle,2)
+            
+            ## some correction to handle frequent movement
+            if 90 < abs(angle) <= 120 and 60 <= abs(angle) < 90:
+                angle = 90
+
             turn_head(angle)
             direction = get_motor_direction(x,y)
             drive_motor(direction,y)
