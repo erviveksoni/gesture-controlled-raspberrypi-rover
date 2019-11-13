@@ -1,9 +1,10 @@
 import math
 import socket
 
-import motor
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
+
+import motor
 import turn
 
 status     = 1          #Motor rotation
@@ -12,6 +13,9 @@ backward   = 0          #Motor backward
 
 left_spd   = 100         #Speed of the car
 right_spd  = 100         #Speed of the car
+
+max_left_angle = 135.0
+max_right_angle = 45.0
 
 # Don't forget to change the variables for the MQTT broker!
 mqtt_username = "visoni"
@@ -28,7 +32,6 @@ def get_ip_address():
     return s.getsockname()[0]
 
 def turn_head(angle):
-    print('')
     turn.turn_to_angle(angle)
 
 def get_angle_from_coords(x,y):
@@ -51,8 +54,25 @@ def get_angle_from_coords(x,y):
         # third quadrant
         angle = math.degrees(math.atan(y/x)) if x!=0.0 else -90.0
         angle += 360.0
+
+    return get_angle_corrections(angle)
+
+def get_angle_corrections(angle):
+    ## Correction for 360 angle
+    if angle > 180:
+        angle = round(360 - angle,2)
+
+    ## max angle movement correction
+    if angle > max_left_angle:
+        angle = max_left_angle
+    elif angle < max_right_angle:
+        angle = max_right_angle
+
+    ## correction to handle frequent movement
+    if 90.0 < abs(angle) <= 120.0 or 60.0 <= abs(angle) < 90.0:
+        angle = 90.0
     
-    return round(angle, 2)
+    return angle
 
 def get_motor_direction(x,y):
     if 0 <= abs(x) <= 0.2 and 0 <= abs(y) <= 0.2:
@@ -80,7 +100,9 @@ def on_connect(client, userdata, flags, rc):
     
     # Once the client has connected to the broker, subscribe to the topic
     client.subscribe(mqtt_topic)
-    
+
+# The message itself is stored in the msg variable
+# and details about who sent it are stored in userdata
 def on_message(client, userdata, msg):
     try:    
         data = str(msg.payload.decode("utf-8"))
@@ -92,23 +114,15 @@ def on_message(client, userdata, msg):
             y = float(values[1])
 
             angle = get_angle_from_coords(x,y)
-            if angle > 180:
-                angle = round(360 - angle,2)
-            
-            ## some correction to handle frequent movement
-            if 90 < abs(angle) <= 120 and 60 <= abs(angle) < 90:
-                angle = 90
-
             turn_head(angle)
+
             direction = get_motor_direction(x,y)
-            drive_motor(direction,y)
-            print('X:', x, " Y:", y, " angle:", angle, " direction: ", direction, end="\r")
+            drive_motor(direction, abs(y))
+
+            print('X:', x, " Y:", y, "   angle:", angle, "   direction: ", direction, end="\r")
     except Exception as e:
         print("Error occured " + str(e))
 
-
-    # The message itself is stored in the msg variable
-    # and details about who sent it are stored in userdata
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
@@ -130,6 +144,7 @@ if __name__ == "__main__":
 
     try:
         setup()
+
         # Once everything has been set up, we can (finally) connect to the broker
         # 1883 is the listener port that the MQTT broker is using
         client.connect(ip_address, 1883,60)
@@ -141,5 +156,6 @@ if __name__ == "__main__":
     except Exception as e:
         print("Error occured " + str(e))
     finally:
+        setup()
         GPIO.cleanup()
         print("Done..")
