@@ -1,5 +1,7 @@
+import asyncio
 import math
 import socket
+import time
 
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
@@ -83,14 +85,34 @@ def get_motor_direction(x,y):
     return "backward"
 
 def drive_motor(direction, speed):
-    if direction == "forward":
-        motor.motor_left(status, forward,left_spd*abs(speed))
-        motor.motor_right(status,backward,right_spd*abs(speed))
-    elif direction == "backward":
-        motor.motor_left(status, backward, left_spd*abs(speed))
-        motor.motor_right(status, forward, right_spd*abs(speed))
-    else:
-        motor.motorStop()
+    try:
+        if direction == "forward":
+            motor.motor_left(status, forward,left_spd*abs(speed))
+            motor.motor_right(status,backward,right_spd*abs(speed))
+        elif direction == "backward":
+            motor.motor_left(status, backward, left_spd*abs(speed))
+            motor.motor_right(status, forward, right_spd*abs(speed))
+        else:
+            motor.motorStop()
+    except Exception as e:
+        print("Error occured " + str(e))
+
+
+async def check_connection_status():
+    last_connected_time =  millis()
+
+    while True:
+        current_time = millis()
+        # if message is not received for last 2 seconds
+        # reset the rover status
+        if(current_time - last_connected_time) > 2000:
+            print("Client disconnected..", end="\r")
+            last_connected_time =  millis()
+            setup()
+
+        await asyncio.sleep(100e-3) #100ms
+    return
+
 
 # These functions handle what happens when the MQTT client connects
 # to the broker, and what happens then the topic receives a message
@@ -104,6 +126,9 @@ def on_connect(client, userdata, flags, rc):
 # The message itself is stored in the msg variable
 # and details about who sent it are stored in userdata
 def on_message(client, userdata, msg):
+    global last_connected_time
+    last_connected_time =  millis()
+
     try:    
         data = str(msg.payload.decode("utf-8"))
         data = data.rstrip('\x00')
@@ -117,7 +142,10 @@ def on_message(client, userdata, msg):
             turn_head(angle)
 
             direction = get_motor_direction(x,y)
-            drive_motor(direction, abs(y))
+            speed = abs(y)
+            if speed > 1.0:
+                speed = 1.0
+            drive_motor(direction, speed)
 
             print('X:', x, " Y:", y, "   angle:", angle, "   direction: ", direction, end="\r")
     except Exception as e:
@@ -129,6 +157,11 @@ def on_disconnect(client, userdata, rc):
         print("Unexpected disconnection.", str(rc))
 
 if __name__ == "__main__":
+    millis = lambda: int(round(time.time() * 1000))
+
+    loop = asyncio.get_event_loop()
+    last_connected_time =  millis()
+
     ip_address = get_ip_address()
     print("Host IP: ", ip_address)
 
@@ -150,12 +183,18 @@ if __name__ == "__main__":
         client.connect(ip_address, 1883,60)
 
         # Once we have told the client to connect, let the client object run itself
-        client.loop_forever()
-        client.disconnect()
+        #client.loop_forever()
+        client.loop_start()
+
+        tasks = [check_connection_status()]
+        loop.run_until_complete(asyncio.wait(tasks))
         motor.destroy()
+        client.disconnect()
+    except KeyboardInterrupt:
+        motor.destroy()
+        client.disconnect()
     except Exception as e:
         print("Error occured " + str(e))
     finally:
         setup()
-        GPIO.cleanup()
         print("Done..")
