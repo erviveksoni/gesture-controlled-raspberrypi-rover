@@ -52,7 +52,7 @@ mqtt_topic = ""
 * Refer this post on configruing [Arduino IDE with NodeMCU](https://www.instructables.com/id/Quick-Start-to-Nodemcu-ESP8266-on-Arduino-IDE/)
 * Download the [nodemcu sketch file](https://github.com/erviveksoni/gesture-controlled-raspberrypi-rover/blob/master/nodemcu_sketch/nodemcu_sketch.ino) to your local machine
 * Open this file in Arduino IDE and update the following section of the sketch with the correct details:
-```c++
+```c
 const char* ssid = "";
 const char* wifi_password = "";
 const char* mqtt_server = ""; #IP Address of the raspberry pi
