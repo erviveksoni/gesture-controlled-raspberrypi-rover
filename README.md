@@ -27,8 +27,12 @@ The Raspberry Pi runs an MQTT server and upon receving the values from the conne
 #### Hardware
 *  Use the image below as a reference and wire the NodeMCU, GY-521 MPU6050, Multi-Color LED and NodeMCU on top of an Breadboard
 <img src="images/NodeMCUWiring.jpg" alt="Gesture Controlled RaspberryPi Rover" width="300" height="168" />
-* Mount the NodeMCU over the top of the glove
+* Mount the NodeMCU over the top of the glove. I used a double sided tape to stick the breadboard to the glove.
 <img src="images/GloveMount.jpg" alt="Gesture Controlled RaspberryPi Rover" width="300" height="168" />
+* Ensure you keep the direction of the GY-521 MPU6050 chip exactly as shown in the image. 
+The INT pin should be facing towards the fingers
+<img src="images/mpu-6050.jpg" alt="Gesture Controlled RaspberryPi Rover" style="transform:rotate(180deg);" />
+
 
 #### Software
 * Setting up an MQTT communication: I found this very helpfull post on setting up and using MQTT communication between a [Raspberry Pi and NodeMCU](https://www.instructables.com/id/How-to-Use-MQTT-With-the-Raspberry-Pi-and-ESP8266/). Follow till section `Step 6: Installing Python Client (paho-mqtt)` of the post. Keep a note of the MQTT credentials
@@ -36,15 +40,19 @@ The Raspberry Pi runs an MQTT server and upon receving the values from the conne
   `git clone https://github.com/erviveksoni/gesture-controlled-raspberrypi-rover`
 * cd to the `gesture-controlled-raspberrypi-rover` folder
 * Open the `drive.py` file and update following section with the details of the MQTT configurations 
-`mqtt_username = ""`
-`mqtt_password = ""`
-`mqtt_topic = ""`
+```python
+mqtt_username = ""
+mqtt_password = ""
+mqtt_topic = ""
+```
 * Download the [nodemcu sketch file](https://github.com/erviveksoni/gesture-controlled-raspberrypi-rover/blob/master/nodemcu_sketch/nodemcu_sketch.ino) to your local machine
 * Update the following section of the sketch with the correct details:
-`const char* ssid = "";`
-`const char* wifi_password = "";`
-`const char* mqtt_server = "";`
-`const char* mqtt_topic = "";`
-`const char* mqtt_username = "";`
-`const char* mqtt_password = "";`
+```c++
+const char* ssid = "";
+const char* wifi_password = "";
+const char* mqtt_server = "";
+const char* mqtt_topic = "";
+const char* mqtt_username = "";
+const char* mqtt_password = "";
+```
 * Upload the sketch to NodeMCU
