@@ -17,7 +17,7 @@ The Raspberry Pi runs an MQTT server and upon receving the values from the conne
 - Mini Breadboard
 - Multi-Color LED
 - Lithium polymer battery to power NodeMCU
-- Connection wires
+- Connecting wires
 - Assembled [Adeept Mars Rover PiCar-B](https://www.adeept.com/adeept-mars-rover-picar-b-wifi-smart-robot-car-kit-for-raspberry-pi-3-model-b-b-2b-speech-recognition-opencv-target-tracking-stem-kit_p0117_s0030.html)
 <br/>![Adeept Mars Rover PiCar-B](/images/rover.jpg)
 - Arduino IDE
@@ -33,11 +33,13 @@ The Raspberry Pi runs an MQTT server and upon receving the values from the conne
 The INT pin should be facing towards the fingers of the glove
 <img src="images/mpu-6050.jpg" alt="Gesture Controlled RaspberryPi Rover" />
 
-* Mount the NodeMCU over the top of the glove. I used a double sided tape to stick the breadboard to the glove.
+* Mount the NodeMCU over the top of the glove. I used a double sided tape to glue the breadboard to the glove
 <img src="images/GloveMount.jpg" alt="Gesture Controlled RaspberryPi Rover" width="300" height="168" />
 
 #### Software
-* Setting up an MQTT communication: I found this very helpfull post on setting up and using MQTT communication between a [Raspberry Pi and NodeMCU](https://www.instructables.com/id/How-to-Use-MQTT-With-the-Raspberry-Pi-and-ESP8266/). Follow till section `Step 6: Installing Python Client (paho-mqtt)` of the post. Keep a note of the MQTT credentials
+* Setting up an MQTT communication: I found this very helpfull post on setting up and using MQTT communication between a [Raspberry Pi and NodeMCU](https://www.instructables.com/id/How-to-Use-MQTT-With-the-Raspberry-Pi-and-ESP8266/). Follow till section `Step 3: Testing the Broker` of the post. Keep a note of the MQTT credentials
+* Installing Python Client (paho-mqtt) on Raspberry Pi
+`sudo pip3 install paho-mqtt`
 * Download this Repository on the Raspberry Pi
   `git clone https://github.com/erviveksoni/gesture-controlled-raspberrypi-rover`
 * cd to the `gesture-controlled-raspberrypi-rover` folder
@@ -52,9 +54,15 @@ mqtt_topic = ""
 ```c++
 const char* ssid = "";
 const char* wifi_password = "";
-const char* mqtt_server = "";
+const char* mqtt_server = ""; #IP Address of the raspberry pi
 const char* mqtt_topic = "";
 const char* mqtt_username = "";
 const char* mqtt_password = "";
 ```
 * Upload the sketch to NodeMCU
+
+## Usage
+* SSH to your raspberry pi  
+* `cd gesture-controlled-raspberrypi-rover`
+* Run `python3 drive.py`
+* Power on the NodeMCU and wait for it to connect to the Raspberry Pi rover. The LED status on the glove should change to green once the NodeMCU starts transmitting data to Raspberry Pi
