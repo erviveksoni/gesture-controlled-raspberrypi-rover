@@ -26,13 +26,15 @@ The Raspberry Pi runs an MQTT server and upon receving the values from the conne
 ## Setup
 #### Hardware
 *  Use the image below as a reference and wire the NodeMCU, GY-521 MPU6050, Multi-Color LED and NodeMCU on top of an Breadboard
+<img src="images/schematic.jpg" alt="Gesture Controlled RaspberryPi Rover" />
 <img src="images/NodeMCUWiring.jpg" alt="Gesture Controlled RaspberryPi Rover" width="300" height="168" />
+
+* Ensure you keep the direction of the GY-521 MPU6050 chip exactly as shown in the image. 
+The INT pin should be facing towards the fingers of the glove
+<img src="images/mpu-6050.jpg" alt="Gesture Controlled RaspberryPi Rover" />
+
 * Mount the NodeMCU over the top of the glove. I used a double sided tape to stick the breadboard to the glove.
 <img src="images/GloveMount.jpg" alt="Gesture Controlled RaspberryPi Rover" width="300" height="168" />
-* Ensure you keep the direction of the GY-521 MPU6050 chip exactly as shown in the image. 
-The INT pin should be facing towards the fingers
-<img src="images/mpu-6050.jpg" alt="Gesture Controlled RaspberryPi Rover" style="transform:rotate(180deg);" />
-
 
 #### Software
 * Setting up an MQTT communication: I found this very helpfull post on setting up and using MQTT communication between a [Raspberry Pi and NodeMCU](https://www.instructables.com/id/How-to-Use-MQTT-With-the-Raspberry-Pi-and-ESP8266/). Follow till section `Step 6: Installing Python Client (paho-mqtt)` of the post. Keep a note of the MQTT credentials
