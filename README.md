@@ -38,7 +38,7 @@ The INT pin should be facing towards the fingers of the glove
 
 #### Software
 * Setting up an MQTT communication: I found this very helpfull post on setting up and using MQTT communication between a [Raspberry Pi and NodeMCU](https://www.instructables.com/id/How-to-Use-MQTT-With-the-Raspberry-Pi-and-ESP8266/). Follow till section `Step 3: Testing the Broker` of the post. Keep a note of the MQTT credentials
-* Installing Python Client (paho-mqtt) on Raspberry Pi
+* Install Python Client (paho-mqtt) on Raspberry Pi
 `sudo pip3 install paho-mqtt`
 * Download this Repository on the Raspberry Pi
   `git clone https://github.com/erviveksoni/gesture-controlled-raspberrypi-rover`
@@ -49,8 +49,9 @@ mqtt_username = ""
 mqtt_password = ""
 mqtt_topic = ""
 ```
+* Refer this post on configruing [Arduino IDE with NodeMCU](https://www.instructables.com/id/Quick-Start-to-Nodemcu-ESP8266-on-Arduino-IDE/)
 * Download the [nodemcu sketch file](https://github.com/erviveksoni/gesture-controlled-raspberrypi-rover/blob/master/nodemcu_sketch/nodemcu_sketch.ino) to your local machine
-* Update the following section of the sketch with the correct details:
+* Open this file in Arduino IDE and update the following section of the sketch with the correct details:
 ```c++
 const char* ssid = "";
 const char* wifi_password = "";
